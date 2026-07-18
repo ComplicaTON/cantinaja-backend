@@ -1,3 +1,0 @@
-br\com\cantinaja\common\exception\GlobalExceptionHandler.class
-br\com\cantinaja\common\config\CommonExceptionAutoConfiguration.class
-br\com\cantinaja\common\exception\BusinessException.class

@@ -1,11 +1,13 @@
 package br.com.cantinaja.cardapio.controller;
 
-import br.com.cantinaja.cardapio.dto.ItemRequest;
-import br.com.cantinaja.cardapio.dto.ItemResponse;
+import br.com.cantinaja.cardapio.dto.ItemRequestDTO;
+import br.com.cantinaja.cardapio.dto.ItemResponseDTO;
 import br.com.cantinaja.cardapio.service.ItemService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,10 +25,8 @@ public class ItemController {
     }
 
     @PostMapping(version = "1.0")
-    public ResponseEntity<ItemResponse> cadastrarItem(ItemRequest dto, HttpServletRequest request) throws URISyntaxException {
-        ItemResponse response = service.criar(dto);
-        return ResponseEntity.created(new URI(request.getRequestURI())).body(response);
+    public ResponseEntity<Void> cadastrarItem(@RequestBody @Valid ItemRequestDTO dto, HttpServletRequest request) {
+        service.criar(dto);
+        return ResponseEntity.created(URI.create(request.getRequestURI())).build();
     }
-
-    // Continue...
 }
