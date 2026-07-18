@@ -16,7 +16,7 @@ public class ItemService {
         this.repository = repository;
     }
 
-    public void criar(ItemRequestDTO dto) {
+    public Item criar(ItemRequestDTO dto) {
         String nomeSanitizado = dto.nome().strip();
         Boolean existeItem = repository.existsByNomeIgnoreCase(nomeSanitizado);
 
@@ -25,6 +25,6 @@ public class ItemService {
         }
 
         Item item = new Item(dto.nome(), dto.preco(), true);
-        repository.save(item);
+        return repository.save(item);
     }
 }
