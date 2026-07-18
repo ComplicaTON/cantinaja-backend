@@ -1,7 +1,6 @@
 package br.com.cantinaja.cardapio.controller;
 
 import br.com.cantinaja.cardapio.dto.ItemRequestDTO;
-import br.com.cantinaja.cardapio.dto.ItemResponseDTO;
 import br.com.cantinaja.cardapio.service.ItemService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/itens")

@@ -18,9 +18,18 @@ spring:
     apiversion:
       use:
         header: Api-Version
+  web:
+    resources:
+      static-locations: classpath:/static/
 
 server:
   port: 8081
+
 springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
   swagger-ui:
+    enabled: true
     path: /swagger-ui.html
+    url: /openapi/openapi.yaml
