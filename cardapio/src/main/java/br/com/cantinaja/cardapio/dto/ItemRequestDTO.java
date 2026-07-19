@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 public record ItemRequestDTO(
         @NotBlank(message = "Nome não pode ser vazio ou nulo")
-        @Pattern(regexp = "^[a-zA-Z ]+$", message = "O nome deve conter apenas letras e espaços")
+        @Pattern(regexp = "^[\\p{L} ]+$", message = "O nome deve conter apenas letras e espaços")
         String nome,
         @NotNull(message = "Preço não pode ser vazio")
         @DecimalMin(value = "0.00", message = "O valor não pode ser menor que 0.00")
