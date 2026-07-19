@@ -27,10 +27,12 @@ Cada épico roda como uma aplicação separada, na sua própria porta.
 
 | Módulo | Porta | Swagger | Console H2 |
 |---|---|---|---|
-| `cardapio` | 8081 | http://localhost:8081/swagger-ui.html | http://localhost:8081/h2-console |
+| `cardapio` | 8081 | http://localhost:8081/api/swagger-ui.html | http://localhost:8081/api/h2-console |
 | `carteira` | 8082 | http://localhost:8082/swagger-ui.html | http://localhost:8082/h2-console |
 | `pedidos` | 8083 | http://localhost:8083/swagger-ui.html | http://localhost:8083/h2-console |
 | `alunos` | 8084 | http://localhost:8084/swagger-ui.html | http://localhost:8084/h2-console |
+
+> O `cardapio` usa `context-path: /api` (por isso o prefixo `/api` nas URLs acima). Cada módulo que adotar esse padrão deve espelhá-lo no seu `application.yaml`.
 
 Além dos quatro épicos, existe o módulo **`common`**: uma biblioteca compartilhada (não é uma aplicação) — veja a seção dedicada abaixo.
 
@@ -41,7 +43,7 @@ Além dos quatro épicos, existe o módulo **`common`**: uma biblioteca comparti
 ```
 cantinaja-backend/
 ├─ pom.xml                → POM raiz (parent + lista de módulos)
-├─ common/                → biblioteca compartilhada (exceptions, handler)
+├─ common/                → biblioteca compartilhada (exceptions, handler, OpenAPI, CORS)
 ├─ cardapio/              → épico A · porta 8081
 ├─ carteira/              → épico B · porta 8082
 ├─ pedidos/               → épico C · porta 8083
@@ -53,8 +55,9 @@ Dentro de cada épico, o código segue a arquitetura em camadas (MVC).
 ```
 <módulo>/src/main/java/br/com/cantinaja/<módulo>/
 ├─ <Módulo>Application.java   → o "botão de ligar" (main)
-├─ config/                    → configurações (ex.: CORS)
+├─ config/                    → configurações específicas do módulo (CORS, OpenAPI e tratamento de erro ficam no common)
 ├─ controller/                → recebe as requisições HTTP (a "porta de entrada")
+│  └─ swagger/                → interfaces de documentação OpenAPI (mantêm o controller limpo)
 ├─ service/                   → onde moram as REGRAS de negócio
 ├─ repository/                → acesso ao banco de dados
 ├─ model/                     → entidades (as tabelas)
@@ -96,48 +99,39 @@ Para o fluxo completo funcionar, os módulos que conversam entre si precisam est
 
 ### O que é
 
-O `common` é uma **biblioteca compartilhada** por todos os módulos. Hoje ele cuida do **tratamento de erros** de forma padronizada: quando uma regra de negócio é quebrada, a API responde sempre no mesmo formato, o **ProblemDetail** (um padrão da internet, a RFC 9457).
+O `common` é uma **biblioteca compartilhada** por todos os módulos. Além do **tratamento de erros** (foco desta seção), ele também fornece, automaticamente e sem configuração no seu módulo: o **CORS** (para o frontend consumir a API), o **OpenAPI base** do Swagger (título/versão a partir do nome do módulo) e o schema de erro (`ErroResponse`) usado na documentação. Tudo isso via auto-configuration — basta ter o `common` como dependência, o que já está pronto.
 
-A grande vantagem: **você escreve o tratamento de erro uma vez, e todos os módulos ganham automaticamente.** Não precisa configurar nada no seu módulo além de já ter o `common` como dependência (o que já está pronto).
+No tratamento de erros, quando uma regra de negócio é quebrada, a API responde sempre no mesmo formato: o **ProblemDetail** (um padrão da internet, a RFC 9457, `application/problem+json`), com dois campos extras nossos — `erro` (código estável) e `mensagem` (texto exibível).
+
+A grande vantagem: **você escreve o tratamento de erro uma vez, e todos os módulos ganham automaticamente.**
 
 Ele tem duas peças que interessam pra você no dia a dia:
 
-**1. `BusinessException`** — a exception que você lança quando uma regra é violada. Ela carrega o status HTTP e a mensagem.
+**1. `BusinessException`** — a exception que você lança quando uma regra é violada. Ela carrega o status HTTP, um **código estável** (ex.: `NOME_DUPLICADO`, consumido pelo frontend) e a mensagem exibível.
 
 ```java
 public class BusinessException extends RuntimeException {
 
     private final HttpStatus status;
+    private final String codigo;
 
-    public BusinessException(HttpStatus status, String message) {
+    public BusinessException(HttpStatus status, String codigo, String message) {
         super(message);
         this.status = status;
+        this.codigo = codigo;
     }
 
     public HttpStatus getStatus() {
         return status;
     }
-}
-```
 
-**2. `GlobalExceptionHandler`** — o "porteiro" que captura essas exceptions e transforma na resposta ProblemDetail. **Você não precisa mexer nele** — ele já funciona sozinho em todos os módulos.
-
-```java
-@RestControllerAdvice
-public class GlobalExceptionHandler {
-
-    @ExceptionHandler(BusinessException.class)
-    public ProblemDetail handleBusiness(BusinessException ex) {
-        return ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGeneric(Exception ex) {
-        return ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno inesperado");
+    public String getCodigo() {
+        return codigo;
     }
 }
 ```
+
+**2. `GlobalExceptionHandler`** — o "porteiro" que captura as exceptions e transforma na resposta ProblemDetail. **Você não precisa mexer nele** — ele já funciona sozinho em todos os módulos, via auto-configuration da `common`. Além da `BusinessException`, ele já trata: validação de `@Valid` no corpo (400), validação de parâmetros (400), JSON malformado (400), método HTTP não suportado (405) e qualquer erro inesperado (500, sem vazar stack trace). Todas as respostas incluem os campos `erro` e `mensagem`.
 
 ### Como usar no seu código (passo a passo)
 
@@ -160,9 +154,11 @@ public class MeuService {
 
     public void minhaOperacao(/* dados de entrada */) {
 
-        // Quando a SUA regra de negócio for violada, lance a exception:
+        // Quando a SUA regra de negócio for violada, lance a exception.
+        // Argumentos: (status HTTP, código estável, mensagem exibível)
         if (/* condição que viola a regra */) {
-            throw new BusinessException(HttpStatus.CONFLICT, "Mensagem explicando o problema");
+            throw new BusinessException(HttpStatus.CONFLICT, "CODIGO_DO_ERRO",
+                    "Mensagem explicando o problema");
         }
 
         // ... caso contrário, segue o fluxo normal ...
@@ -174,15 +170,17 @@ public class MeuService {
 
 **Qual status usar?** Escolha o que combina com a regra (veja a [tabela abaixo](#tabela-de-status-http-mais-usados)). Alguns exemplos do nosso domínio:
 
+O segundo argumento é o **código estável** — um identificador em CAIXA_ALTA que o frontend usa para decidir comportamento (é o campo `erro` da resposta). Use os códigos definidos na US do seu épico (ex.: `NOME_DUPLICADO`, `VARIACAO_PRECO_INVALIDA`, `SALDO_INSUFICIENTE`).
+
 ```java
 // Conflito de estado ou duplicidade → CONFLICT (409)
-throw new BusinessException(HttpStatus.CONFLICT, "Descrição do conflito");
+throw new BusinessException(HttpStatus.CONFLICT, "NOME_DUPLICADO", "Descrição do conflito");
 
 // Dado inválido ou regra de valor → BAD_REQUEST (400)
-throw new BusinessException(HttpStatus.BAD_REQUEST, "Descrição do dado inválido");
+throw new BusinessException(HttpStatus.BAD_REQUEST, "DADO_INVALIDO", "Descrição do dado inválido");
 
 // Recurso não encontrado → NOT_FOUND (404)
-throw new BusinessException(HttpStatus.NOT_FOUND, "Recurso não encontrado");
+throw new BusinessException(HttpStatus.NOT_FOUND, "ITEM_NAO_ENCONTRADO", "Recurso não encontrado");
 ```
 
 ### O que o cliente recebe
@@ -196,11 +194,13 @@ Quando a regra é violada, a API responde com o status HTTP correto e um corpo J
   "type": "about:blank",
   "title": "Conflict",
   "status": 409,
-  "detail": "Descrição do problema que aconteceu"
+  "detail": "Descrição do problema que aconteceu",
+  "erro": "NOME_DUPLICADO",
+  "mensagem": "Descrição do problema que aconteceu"
 }
 ```
 
-O frontend consegue ler o `status` para saber o que aconteceu e o `detail` para mostrar a mensagem ao usuário. Como todas as APIs do projeto usam o mesmo formato, o frontend trata os erros de todos os módulos da mesma maneira.
+O formato segue o padrão RFC 9457 (`application/problem+json`) do Spring, com dois campos extras nossos: `erro` (o código estável, para o frontend decidir comportamento por ele) e `mensagem` (o texto exibível, espelho do `detail`). Como todas as APIs do projeto usam o mesmo formato, o frontend trata os erros de todos os módulos da mesma maneira.
 
 ### Tabela de status HTTP mais usados
 
