@@ -1,5 +1,6 @@
 package br.com.cantinaja.cardapio.controller;
 
+import br.com.cantinaja.cardapio.controller.swagger.ItemControllerSwagger;
 import br.com.cantinaja.cardapio.dto.ItemRequestDTO;
 import br.com.cantinaja.cardapio.model.Item;
 import br.com.cantinaja.cardapio.service.ItemService;
@@ -15,7 +16,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/itens")
-public class ItemController {
+public class ItemController implements ItemControllerSwagger {
 
     private final ItemService service;
 
@@ -23,7 +24,8 @@ public class ItemController {
         this.service = service;
     }
 
-    @PostMapping(version = "1.0")
+    @Override
+    @PostMapping(version = "1.0.0")
     public ResponseEntity<Void> cadastrarItem(@RequestBody @Valid ItemRequestDTO dto, HttpServletRequest request) {
         Item item = service.criar(dto);
         URI location = URI.create(request.getRequestURI() + "/" + item.getId());

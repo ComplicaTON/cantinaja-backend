@@ -21,7 +21,7 @@ public class ItemService {
         Boolean existeItem = repository.existsByNomeIgnoreCase(nomeSanitizado);
 
         if (existeItem) {
-            throw new BusinessException(HttpStatus.CONFLICT, dto.nome() + " já existe no cardápio");
+            throw new BusinessException(HttpStatus.CONFLICT, "NOME_DUPLICADO", dto.nome() + " já existe no cardápio");
         }
 
         Item item = new Item(nomeSanitizado, dto.preco(), true);

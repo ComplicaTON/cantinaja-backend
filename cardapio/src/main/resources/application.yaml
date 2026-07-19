@@ -4,8 +4,8 @@ spring:
   datasource:
     url: jdbc:h2:mem:cardapiodb
     driver-class-name: org.h2.Driver
-    username: sa
-    password: teste
+    username: cantinaja
+    password: cantinaja123
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,12 +17,12 @@ spring:
   mvc:
     apiversion:
       use:
-        header: Api-Version
-  web:
-    resources:
-      static-locations: classpath:/static/
+        header: version
+      default: 1.0.0
 
 server:
+  servlet:
+    context-path: /api
   port: 8081
 
 springdoc:
@@ -32,4 +32,3 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
-    url: /openapi/openapi.yaml

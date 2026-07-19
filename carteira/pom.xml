@@ -5,27 +5,14 @@
 	<parent>
 		<groupId>br.com.cantinaja</groupId>
 		<artifactId>cantinaja-backend</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>carteira</artifactId>
 	<packaging>jar</packaging>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<name>carteira</name>
+	<description>Módulo Carteira da API CantinaJá</description>
 	<properties>
 		<java.version>25</java.version>
 	</properties>

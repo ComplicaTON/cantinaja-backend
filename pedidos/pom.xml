@@ -5,27 +5,14 @@
 	<parent>
 		<groupId>br.com.cantinaja</groupId>
 		<artifactId>cantinaja-backend</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>pedidos</artifactId>
 	<packaging>jar</packaging>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<name>pedidos</name>
+	<description>Módulo Pedidos da API CantinaJá</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -70,6 +57,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
 		</plugins>
 	</build>
 

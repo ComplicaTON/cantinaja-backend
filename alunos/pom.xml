@@ -13,21 +13,8 @@
 	<artifactId>alunos</artifactId>
 	<packaging>jar</packaging>
 
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<name>alunos</name>
+	<description>Módulo Alunos da API CantinaJá</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
