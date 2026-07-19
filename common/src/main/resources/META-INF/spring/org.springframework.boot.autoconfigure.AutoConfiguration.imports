@@ -1,1 +1,3 @@
 br.com.cantinaja.common.config.CommonExceptionAutoConfiguration
+br.com.cantinaja.common.config.OpenApiAutoConfiguration
+br.com.cantinaja.common.config.WebCorsAutoConfiguration

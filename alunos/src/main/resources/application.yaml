@@ -4,8 +4,8 @@ spring:
   datasource:
     url: jdbc:h2:mem:alunosdb
     driver-class-name: org.h2.Driver
-    username: sa
-    password: teste
+    username: cantinaja
+    password: cantinaja123
   jpa:
     hibernate:
       ddl-auto: update
