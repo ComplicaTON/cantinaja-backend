@@ -24,7 +24,7 @@ public class ItemService {
             throw new BusinessException(HttpStatus.CONFLICT, dto.nome() + " já existe no cardápio");
         }
 
-        Item item = new Item(dto.nome(), dto.preco(), true);
+        Item item = new Item(nomeSanitizado, dto.preco(), true);
         return repository.save(item);
     }
 }
