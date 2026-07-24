@@ -3,12 +3,7 @@ package br.com.cantinaja.carteira.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "transacoes_carteira")
@@ -18,14 +13,13 @@ public class TransacaoCarteira {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "carteira_id", nullable = false)
-    private Long carteiraId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "carteira_id", nullable = false)
+    private Carteira carteira;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
-    private String tipo;
-
-    @Column(name = "descricao", nullable = false)
-    private String descricao;
+    private TipoTransacao tipo;
 
     @Column(name = "valor", nullable = false, precision = 10, scale = 2)
     private BigDecimal valor;
@@ -33,34 +27,31 @@ public class TransacaoCarteira {
     @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
+    protected TransacaoCarteira() {
+        // Construtor protegido para uso do JPA
+    }
+
     public TransacaoCarteira(
-        Long carteiraId, 
-        String tipo, 
-        String descricao, 
-        BigDecimal valor, 
-        LocalDateTime dataHora
+        Carteira carteira, 
+        TipoTransacao tipo, 
+        BigDecimal valor
     ) {
-        this.carteiraId = carteiraId;
+        this.carteira = carteira;
         this.tipo = tipo;
-        this.descricao = descricao;
         this.valor = valor;
-        this.dataHora = dataHora;
+        this.dataHora = LocalDateTime.now();
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getCarteiraId() {
-        return carteiraId;
+    public Carteira getCarteira() {
+        return carteira;
     }
 
-    public String getTipo() {
+    public TipoTransacao getTipo() {
         return tipo;
-    }
-
-    public String getDescricao() {
-        return descricao;
     }
 
     public BigDecimal getValor() {
@@ -69,21 +60,5 @@ public class TransacaoCarteira {
 
     public LocalDateTime getDataHora() {
         return dataHora;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public void setValor(BigDecimal valor) {
-        this.valor = valor;
-    }
-
-    public void setDataHora(LocalDateTime dataHora) {
-        this.dataHora = dataHora;
     }
 }
