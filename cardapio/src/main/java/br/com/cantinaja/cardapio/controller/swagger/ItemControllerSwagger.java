@@ -1,6 +1,8 @@
 package br.com.cantinaja.cardapio.controller.swagger;
 
 import br.com.cantinaja.cardapio.dto.ItemRequestDTO;
+import br.com.cantinaja.cardapio.dto.ItemUpdateRequestDTO;
+import br.com.cantinaja.cardapio.model.Item;
 import br.com.cantinaja.common.exception.ErroResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,4 +42,30 @@ public interface ItemControllerSwagger {
                             value = "{\"nome\": \"Coxinha de Frango\", \"preco\": 10.00}")))
             ItemRequestDTO dto,
             HttpServletRequest request);
+
+
+    @Operation(summary = "Atualiza parcialmente um item (Nome e/ou Preço)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Item atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Variação de preço inválida (acima do dobro ou abaixo da metade)",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ErroResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Item não encontrado",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ErroResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Já existe outro item com este novo nome",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ErroResponse.class)))
+    })
+    ResponseEntity<Item> atualizar(
+            Long id,
+            @RequestBody(required = true, content = @Content(
+                    mediaType = "application/json",
+                    examples = {
+                            @ExampleObject(name = "Atualizar só o Preço", value = "{\"preco\": 12.50}"),
+                            @ExampleObject(name = "Atualizar só o Nome", value = "{\"nome\": \"Coxinha de Catupiry\"}"),
+                            @ExampleObject(name = "Atualizar Ambos", value = "{\"nome\": \"Coxinha Especial\", \"preco\": 15.00}")
+                    }))
+            ItemUpdateRequestDTO dto);
 }
+
