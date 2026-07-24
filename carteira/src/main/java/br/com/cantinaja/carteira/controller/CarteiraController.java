@@ -18,7 +18,7 @@ public class CarteiraController {
         this.carteiraService = carteiraService;
     }
 
-    @PostMapping("/{alunoId}/recargas")
+    @PostMapping(value="/{alunoId}/recargas", version = "1.0.0")
     public ResponseEntity<CarteiraResponseDTO> recarregar(
             @PathVariable Long alunoId,
             @Valid @RequestBody RecargaRequestDTO request
