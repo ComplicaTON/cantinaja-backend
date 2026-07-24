@@ -1,5 +1,6 @@
 package br.com.cantinaja.carteira.controller;
 
+import br.com.cantinaja.carteira.controller.swagger.CarteiraControllerSwagger;
 import br.com.cantinaja.carteira.dto.CarteiraResponseDTO;
 import br.com.cantinaja.carteira.dto.RecargaRequestDTO;
 import br.com.cantinaja.carteira.service.CarteiraService;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/carteiras")
-public class CarteiraController {
+public class CarteiraController implements CarteiraControllerSwagger {
 
     private final CarteiraService carteiraService;
 
@@ -18,6 +19,7 @@ public class CarteiraController {
         this.carteiraService = carteiraService;
     }
 
+    @Override
     @PostMapping(value="/{alunoId}/recargas", version = "1.0.0")
     public ResponseEntity<CarteiraResponseDTO> recarregar(
             @PathVariable Long alunoId,
