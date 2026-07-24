@@ -17,12 +17,9 @@ spring:
   mvc:
     apiversion:
       use:
-        header: version
-      default: 1.0.0
+        path-segment: 1
 
 server:
-  servlet:
-    context-path: /api
   port: 8081
 
 springdoc:

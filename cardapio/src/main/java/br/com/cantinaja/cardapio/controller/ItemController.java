@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/itens")
+@RequestMapping(value = "/api/{version}/itens", version = "v1")
 public class ItemController implements ItemControllerSwagger {
 
     private final ItemService service;
@@ -25,7 +25,7 @@ public class ItemController implements ItemControllerSwagger {
     }
 
     @Override
-    @PostMapping(version = "1.0.0")
+    @PostMapping
     public ResponseEntity<Void> cadastrarItem(@RequestBody @Valid ItemRequestDTO dto, HttpServletRequest request) {
         Item item = service.criar(dto);
         URI location = URI.create(request.getRequestURI() + "/" + item.getId());
