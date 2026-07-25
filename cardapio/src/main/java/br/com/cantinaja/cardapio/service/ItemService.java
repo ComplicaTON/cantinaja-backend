@@ -13,6 +13,8 @@ import java.math.RoundingMode;
 
 @Service
 public class ItemService {
+    private static final BigDecimal DOBRO = BigDecimal.valueOf(2);
+    private static final BigDecimal METADE = new BigDecimal("0.5");
 
     private final ItemRepository repository;
 
@@ -35,7 +37,8 @@ public class ItemService {
         Item item = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "ITEM_NAO_ENCONTRADO", "Item não encontrado."));
 
-        if (dto.preco() != null) { validarVariacaoPreco(item.getPreco(), dto.preco());
+        if (dto.preco() != null) {
+            validarVariacaoPreco(item.getPreco(), dto.preco());
             item.setPreco(dto.preco());
         }
 
@@ -54,8 +57,8 @@ public class ItemService {
 }
 
 private void validarVariacaoPreco(BigDecimal precoAtual, BigDecimal precoNovo) {
-    BigDecimal limiteMaximo = precoAtual.multiply(BigDecimal.valueOf(2));
-    BigDecimal limiteMinimo = precoAtual.divide(BigDecimal.valueOf(2), RoundingMode.HALF_UP);
+    BigDecimal limiteMaximo = precoAtual.multiply(DOBRO);
+    BigDecimal limiteMinimo = precoAtual.multiply(METADE);
 
     if (precoNovo.compareTo(limiteMaximo) > 0 || precoNovo.compareTo(limiteMinimo) < 0) {
         throw new BusinessException(HttpStatus.BAD_REQUEST, "VARIACAO_PRECO_INVALIDA", "A atualização de preço não pode passar do dobro nem da metade do valor atual");
