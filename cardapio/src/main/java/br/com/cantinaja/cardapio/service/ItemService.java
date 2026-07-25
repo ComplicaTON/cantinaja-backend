@@ -13,7 +13,7 @@ import java.math.RoundingMode;
 
 @Service
 public class ItemService {
-    private static final BigDecimal DOBRO = BigDecimal.valueOf(2);
+    private static final BigDecimal DOBRO = new BigDecimal("2");
     private static final BigDecimal METADE = new BigDecimal("0.5");
 
     private final ItemRepository repository;
