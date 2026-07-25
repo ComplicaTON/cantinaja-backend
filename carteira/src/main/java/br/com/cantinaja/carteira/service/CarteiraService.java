@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class CarteiraService {
@@ -50,5 +51,21 @@ public class CarteiraService {
 
     private CarteiraResponseDTO montarResponse(Carteira carteira) {
         return new CarteiraResponseDTO(carteira.getAlunoId(), carteira.getSaldo(), false);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<?> consultarTransacoes(Long alunoId, TipoTransacao tipo){
+        Carteira carteira = carteiraRepository.findByAlunoId(alunoId)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "CARTEIRA_NAO_ENCONTRADA", "Carteira não encontrada"));
+
+        List<TransacaoCarteira> transacoes;
+        if (tipo != null) {
+            transacoes = transacaoRepository.findByCarteiraIdAndTipoOrderByDataHoraDesc(carteira.getId(), tipo);
+        } else {
+            transacoes = transacaoRepository.findByCarteiraIdOrderByDataHoraDesc(carteira.getId());
+        }
+
+        return transacoes;
     }
 }
