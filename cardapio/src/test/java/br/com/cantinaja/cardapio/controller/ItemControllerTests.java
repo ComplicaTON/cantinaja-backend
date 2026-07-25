@@ -7,16 +7,12 @@ import br.com.cantinaja.common.exception.BusinessException;
 import br.com.cantinaja.common.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.webmvc.test.autoconfigure.MockMvcBuilderCustomizer;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.ConfigurableMockMvcBuilder;
-import org.springframework.web.client.ApiVersionInserter;
 
 import java.math.BigDecimal;
 
@@ -42,9 +38,8 @@ public class ItemControllerTests {
         when(service.criar(any(ItemRequestDTO.class)))
                 .thenReturn(new Item(1L, "Coxinha de Frango", new BigDecimal("10.00"), true));
 
-        mockMvc.perform(post("/itens")
+        mockMvc.perform(post("/api/v1/itens")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .apiVersion("1.0.0")
                         .content("""
                                 {"nome":"Coxinha de Frango","preco":10.00}
                                 """))
@@ -53,9 +48,8 @@ public class ItemControllerTests {
 
     @Test
     void deveRetornar400AoCadastrarItemComNomeContendoCaracteresInvalidos() throws Exception {
-        mockMvc.perform(post("/itens")
+        mockMvc.perform(post("/api/v1/itens")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .apiVersion("1.0.0")
                         .content("""
                                 {"nome":"Coxinha123","preco":10.00}
                                 """))
@@ -64,9 +58,8 @@ public class ItemControllerTests {
 
     @Test
     void deveRetornar400AoCadastrarItemComNomeVazio() throws Exception {
-        mockMvc.perform(post("/itens")
+        mockMvc.perform(post("/api/v1/itens")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .apiVersion("1.0.0")
                         .content("""
                                 {"nome":"","preco":10.00}
                                 """))
@@ -75,9 +68,8 @@ public class ItemControllerTests {
 
     @Test
     void deveRetornar400AoCadastrarItemComPrecoNegativo() throws Exception {
-        mockMvc.perform(post("/itens")
+        mockMvc.perform(post("/api/v1/itens")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .apiVersion("1.0.0")
                         .content("""
                                 {"nome":"Coxinha de Frango","preco":-1.00}
                                 """))
@@ -86,9 +78,8 @@ public class ItemControllerTests {
 
     @Test
     void deveRetornar400AoCadastrarItemSemPreco() throws Exception {
-        mockMvc.perform(post("/itens")
+        mockMvc.perform(post("/api/v1/itens")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .apiVersion("1.0.0")
                         .content("""
                                 {"nome":"Coxinha de Frango"}
                                 """))
@@ -100,22 +91,13 @@ public class ItemControllerTests {
         doThrow(new BusinessException(HttpStatus.CONFLICT, "NOME_DUPLICADO", "Coxinha de Frango já existe no cardápio"))
                 .when(service).criar(any(ItemRequestDTO.class));
 
-        mockMvc.perform(post("/itens")
+        mockMvc.perform(post("/api/v1/itens")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .apiVersion("1.0.0")
                         .content("""
                                 {"nome":"Coxinha de Frango","preco":10.00}
                                 """))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409))
                 .andExpect(jsonPath("$.detail").value("Coxinha de Frango já existe no cardápio"));
-    }
-
-    @TestConfiguration
-    static class ItemControllerTestsConfig implements MockMvcBuilderCustomizer {
-        @Override
-        public void customize(ConfigurableMockMvcBuilder<?> builder) {
-            builder.apiVersionInserter(ApiVersionInserter.useHeader("Api-Version"));
-        }
     }
 }
