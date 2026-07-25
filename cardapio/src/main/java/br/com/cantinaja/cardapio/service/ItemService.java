@@ -7,6 +7,7 @@ import br.com.cantinaja.cardapio.repository.ItemRepository;
 import br.com.cantinaja.common.exception.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,6 +23,7 @@ public class ItemService {
         this.repository = repository;
     }
 
+    @Transactional
     public Item criar(ItemRequestDTO dto) {
         String nomeSanitizado = dto.nome().strip();
         Boolean existeItem = repository.existsByNomeIgnoreCase(nomeSanitizado);
@@ -33,6 +35,8 @@ public class ItemService {
         Item item = new Item(nomeSanitizado, dto.preco(), true);
         return repository.save(item);
     }
+
+    @Transactional
     public Item atualizar(Long id, ItemUpdateRequestDTO dto) {
         Item item = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "ITEM_NAO_ENCONTRADO", "Item não encontrado."));
@@ -53,7 +57,7 @@ public class ItemService {
             }
         }
 
-        return repository.save(item);
+        return item;
 }
 
 private void validarVariacaoPreco(BigDecimal precoAtual, BigDecimal precoNovo) {
