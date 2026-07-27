@@ -1,5 +1,7 @@
 package br.com.cantinaja.carteira.controller.swagger;
 
+import org.springframework.http.ResponseEntity;
+
 import br.com.cantinaja.carteira.dto.CarteiraResponseDTO;
 import br.com.cantinaja.carteira.dto.RecargaRequestDTO;
 import br.com.cantinaja.common.exception.ErroResponse;
@@ -12,7 +14,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
 
 /**
  * Documentação OpenAPI do {@code CarteiraController}. Concentra TODA a
@@ -36,4 +37,17 @@ public interface CarteiraControllerSwagger {
             @Parameter(description = "Identificador do aluno dono da carteira", example = "1") Long alunoId,
 
             @RequestBody(required = true, content = @Content(mediaType = "application/json", examples = @ExampleObject(name = "Recarga válida", value = "{\"valor\": 50.00}"))) RecargaRequestDTO request);
+
+    @Operation(summary = "Consulta a carteira do aluno", description = "Retorna o saldo atual e o alerta de saldo baixo. "
+            + "A carteira é conceitualmente sempre existente: se o aluno nunca recarregou, "
+            + "retorna saldo 0.00 e saldoBaixo true, sem erro.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Consulta realizada com sucesso — retorna a carteira", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CarteiraResponseDTO.class), examples = {
+                    @ExampleObject(name = "Saldo confortável", value = "{\"alunoId\": 1, \"saldo\": 50.00, \"saldoBaixo\": false}"),
+                    @ExampleObject(name = "Saldo baixo", value = "{\"alunoId\": 2, \"saldo\": 7.00, \"saldoBaixo\": true}"),
+                    @ExampleObject(name = "Carteira nunca usada", value = "{\"alunoId\": 3, \"saldo\": 0.00, \"saldoBaixo\": true}")
+            }))
+    })
+    ResponseEntity<CarteiraResponseDTO> consultar(
+            @Parameter(description = "Identificador do aluno dono da carteira", example = "1") Long alunoId);
 }
