@@ -2,6 +2,7 @@ package br.com.cantinaja.carteira.controller.swagger;
 
 import br.com.cantinaja.carteira.dto.CarteiraResponseDTO;
 import br.com.cantinaja.carteira.dto.RecargaRequestDTO;
+import br.com.cantinaja.carteira.model.TipoTransacao;
 import br.com.cantinaja.common.exception.ErroResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 /**
  * Documentação OpenAPI do {@code CarteiraController}. Concentra TODA a
@@ -36,4 +39,15 @@ public interface CarteiraControllerSwagger {
             @Parameter(description = "Identificador do aluno dono da carteira", example = "1") Long alunoId,
 
             @RequestBody(required = true, content = @Content(mediaType = "application/json", examples = @ExampleObject(name = "Recarga válida", value = "{\"valor\": 50.00}"))) RecargaRequestDTO request);
+
+    @Operation(summary = "Consultar transações da carteira", description = "Retorna a lista de transações do aluno. Permite filtrar por tipo de transação.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Consulta realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Tipo de transação inválido", content = @Content(mediaType = "application/json", examples = @ExampleObject(name = "TipoInvalido", value = "{\"erro\": \"TIPO_TRANSACAO_INVALIDO\", \"mensagem\": \"O tipo de transação informado é inválido\"}")))
+    })
+    ResponseEntity<List<?>> consultarTransacoes(
+            @Parameter(description = "Identificador do aluno dono da carteira", example = "1") Long alunoId,
+            @Parameter(description = "Tipo da transação para filtro (valores aceitos no enum TipoTransacao)", example = "PIX") TipoTransacao tipo
+    );
 }
+
