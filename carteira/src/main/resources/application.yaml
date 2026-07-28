@@ -17,8 +17,8 @@ spring:
   mvc:
     apiversion:
       use:
-        header: version
-      default: v1
+        path-segment: 1
+      default: "v1"
 
 server:
   port: 8082

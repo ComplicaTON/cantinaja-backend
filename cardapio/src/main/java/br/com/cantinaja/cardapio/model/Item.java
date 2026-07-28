@@ -48,4 +48,8 @@ public class Item {
     public Boolean getDisponivel() {
         return disponivel;
     }
+
+    public void setNome(String nome) {this.nome = nome;}
+
+    public void setPreco(BigDecimal preco) {this.preco = preco;}
 }

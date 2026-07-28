@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/carteiras")
+@RequestMapping("/api/{version}/carteiras")
 public class CarteiraController implements CarteiraControllerSwagger {
 
     private final CarteiraService carteiraService;
@@ -23,7 +23,7 @@ public class CarteiraController implements CarteiraControllerSwagger {
     }
 
     @Override
-    @PostMapping(value="/{alunoId}/recargas", version = "1.0.0")
+    @PostMapping(value="/{alunoId}/recargas")
     public ResponseEntity<CarteiraResponseDTO> recarregar(
             @PathVariable Long alunoId,
             @Valid @RequestBody RecargaRequestDTO request
