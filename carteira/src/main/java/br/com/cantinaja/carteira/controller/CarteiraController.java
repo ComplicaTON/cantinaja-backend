@@ -3,6 +3,7 @@ package br.com.cantinaja.carteira.controller;
 import br.com.cantinaja.carteira.controller.swagger.CarteiraControllerSwagger;
 import br.com.cantinaja.carteira.dto.CarteiraResponseDTO;
 import br.com.cantinaja.carteira.dto.RecargaRequestDTO;
+import br.com.cantinaja.carteira.dto.TransacaoResponseDTO;
 import br.com.cantinaja.carteira.model.TipoTransacao;
 import br.com.cantinaja.carteira.service.CarteiraService;
 import jakarta.validation.Valid;
@@ -32,6 +33,10 @@ public class CarteiraController implements CarteiraControllerSwagger {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+
+
+    @GetMapping(value = "/{alunoId}/transacoes")
+    public ResponseEntity<List<TransacaoResponseDTO>> consultarTransacoes(
     // Metodo ->  consultarTransacoes
 
     @GetMapping(value = "/{alunoId}/transacoes")
@@ -41,6 +46,7 @@ public class CarteiraController implements CarteiraControllerSwagger {
 
             ){
 
+        List <TransacaoResponseDTO> transacoes = carteiraService.consultarTransacoes(alunoId, tipo);
         var transacoes = carteiraService.consultarTransacoes(alunoId, tipo);
         return ResponseEntity.ok(transacoes);
     }

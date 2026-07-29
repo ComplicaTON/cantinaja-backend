@@ -2,6 +2,7 @@ package br.com.cantinaja.carteira.service;
 
 import br.com.cantinaja.carteira.dto.CarteiraResponseDTO;
 import br.com.cantinaja.carteira.dto.RecargaRequestDTO;
+import br.com.cantinaja.carteira.dto.TransacaoResponseDTO;
 import br.com.cantinaja.carteira.model.Carteira;
 import br.com.cantinaja.carteira.model.TipoTransacao;
 import br.com.cantinaja.carteira.model.TransacaoCarteira;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CarteiraService {
@@ -55,6 +57,7 @@ public class CarteiraService {
 
 
     @Transactional(readOnly = true)
+    public List<TransacaoResponseDTO> consultarTransacoes(Long alunoId, TipoTransacao tipo){
     public List<?> consultarTransacoes(Long alunoId, TipoTransacao tipo){
         Carteira carteira = carteiraRepository.findByAlunoId(alunoId)
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "CARTEIRA_NAO_ENCONTRADA", "Carteira não encontrada"));
@@ -66,6 +69,9 @@ public class CarteiraService {
             transacoes = transacaoRepository.findByCarteiraIdOrderByDataHoraDesc(carteira.getId());
         }
 
+        return transacoes.stream()
+                .map(TransacaoResponseDTO::fromEntity)
+                .collect(Collectors.toList());
         return transacoes;
     }
 }
