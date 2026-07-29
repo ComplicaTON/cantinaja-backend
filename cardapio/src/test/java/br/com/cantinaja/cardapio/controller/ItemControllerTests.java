@@ -35,7 +35,7 @@ public class ItemControllerTests {
 
     @Test
     void deveRetornar201ECadastrarOItem() throws Exception {
-        when(service.criar(any(ItemRequestDTO.class)))
+        when(service.cadastrar(any(ItemRequestDTO.class)))
                 .thenReturn(new Item(1L, "Coxinha de Frango", new BigDecimal("10.00"), true));
 
         mockMvc.perform(post("/api/v1/itens")
@@ -89,7 +89,7 @@ public class ItemControllerTests {
     @Test
     void deveRetornar409AoCadastrarItemExistente() throws Exception {
         doThrow(new BusinessException(HttpStatus.CONFLICT, "NOME_DUPLICADO", "Coxinha de Frango já existe no cardápio"))
-                .when(service).criar(any(ItemRequestDTO.class));
+                .when(service).cadastrar(any(ItemRequestDTO.class));
 
         mockMvc.perform(post("/api/v1/itens")
                         .contentType(MediaType.APPLICATION_JSON)

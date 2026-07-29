@@ -1,6 +1,8 @@
 package br.com.cantinaja.cardapio.repository;
 
 import br.com.cantinaja.cardapio.model.Item;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface ItemRepository extends JpaRepository<Item, Long> {
     Boolean existsByNomeIgnoreCase(String nome);
     boolean existsByNomeIgnoreCaseAndIdNot (String nome, Long id);
+    Page<Item> findByDisponivelTrueOrderByNomeAsc(Pageable pageable);
+    Page<Item> findAllByOrderByDisponivelDescNomeAsc(Pageable pageable);
 }

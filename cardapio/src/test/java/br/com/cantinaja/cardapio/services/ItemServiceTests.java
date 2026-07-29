@@ -33,7 +33,7 @@ public class ItemServiceTests {
         ItemRequestDTO dto = new ItemRequestDTO("Coxinha de Frango", new BigDecimal("10.00"));
         when(repository.existsByNomeIgnoreCase(dto.nome())).thenReturn(false);
         when(repository.save(any(Item.class))).thenReturn(new Item(1L, dto.nome(), dto.preco(), true));
-        Item item = service.criar(dto);
+        Item item = service.cadastrar(dto);
         assertEquals(1L, item.getId().longValue());
         assertEquals(dto.nome(), item.getNome());
         assertEquals(dto.preco(), item.getPreco());
@@ -44,6 +44,6 @@ public class ItemServiceTests {
     void deveRetornarExceptionAoCadastrarItemComNomeDuplicado() {
         when(repository.existsByNomeIgnoreCase(any(String.class))).thenReturn(true);
         ItemRequestDTO dto = new ItemRequestDTO("Coxinha de Frango", new BigDecimal("10.00"));
-        Assertions.assertThrows(BusinessException.class, () -> service.criar(dto));
+        Assertions.assertThrows(BusinessException.class, () -> service.cadastrar(dto));
     }
 }

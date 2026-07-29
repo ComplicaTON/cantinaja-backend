@@ -1,16 +1,18 @@
 package br.com.cantinaja.cardapio.service;
 
 import br.com.cantinaja.cardapio.dto.ItemRequestDTO;
+import br.com.cantinaja.cardapio.dto.ItemResponseDTO;
 import br.com.cantinaja.cardapio.dto.ItemUpdateRequestDTO;
 import br.com.cantinaja.cardapio.model.Item;
 import br.com.cantinaja.cardapio.repository.ItemRepository;
 import br.com.cantinaja.common.exception.BusinessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Service
 public class ItemService {
@@ -23,8 +25,15 @@ public class ItemService {
         this.repository = repository;
     }
 
+    @Transactional(readOnly = true)
+    public Page<Item> listar(Boolean disponivel, Pageable pageable) {
+        return Boolean.TRUE.equals(disponivel)
+                ? repository.findByDisponivelTrueOrderByNomeAsc(pageable)
+                : repository.findAllByOrderByDisponivelDescNomeAsc(pageable);
+    }
+
     @Transactional
-    public Item criar(ItemRequestDTO dto) {
+    public Item cadastrar(ItemRequestDTO dto) {
         String nomeSanitizado = dto.nome().strip();
         Boolean existeItem = repository.existsByNomeIgnoreCase(nomeSanitizado);
 
@@ -38,6 +47,11 @@ public class ItemService {
 
     @Transactional
     public Item atualizar(Long id, ItemUpdateRequestDTO dto) {
+
+        if (dto.nome() == null && dto.preco() == null) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "AUSENCIA_DE_DADOS", "Precisa informar nome ou preço.");
+        }
+
         Item item = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "ITEM_NAO_ENCONTRADO", "Item não encontrado."));
 
@@ -58,14 +72,14 @@ public class ItemService {
         }
 
         return item;
-}
-
-private void validarVariacaoPreco(BigDecimal precoAtual, BigDecimal precoNovo) {
-    BigDecimal limiteMaximo = precoAtual.multiply(DOBRO);
-    BigDecimal limiteMinimo = precoAtual.multiply(METADE);
-
-    if (precoNovo.compareTo(limiteMaximo) > 0 || precoNovo.compareTo(limiteMinimo) < 0) {
-        throw new BusinessException(HttpStatus.BAD_REQUEST, "VARIACAO_PRECO_INVALIDA", "A atualização de preço não pode passar do dobro nem da metade do valor atual");
     }
-}
+
+    private void validarVariacaoPreco(BigDecimal precoAtual, BigDecimal precoNovo) {
+        BigDecimal limiteMaximo = precoAtual.multiply(DOBRO);
+        BigDecimal limiteMinimo = precoAtual.multiply(METADE);
+
+        if (precoNovo.compareTo(limiteMaximo) > 0 || precoNovo.compareTo(limiteMinimo) < 0) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "VARIACAO_PRECO_INVALIDA", "A atualização de preço não pode passar do dobro nem da metade do valor atual");
+        }
+    }
 }
