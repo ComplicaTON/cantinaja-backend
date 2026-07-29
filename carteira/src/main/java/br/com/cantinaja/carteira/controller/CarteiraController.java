@@ -37,12 +37,17 @@ public class CarteiraController implements CarteiraControllerSwagger {
 
     @GetMapping(value = "/{alunoId}/transacoes")
     public ResponseEntity<List<TransacaoResponseDTO>> consultarTransacoes(
+    // Metodo ->  consultarTransacoes
+
+    @GetMapping(value = "/{alunoId}/transacoes")
+    public ResponseEntity<List<?>> consultarTransacoes(
             @PathVariable Long alunoId,
             @RequestParam(required = false) TipoTransacao tipo
 
             ){
 
         List <TransacaoResponseDTO> transacoes = carteiraService.consultarTransacoes(alunoId, tipo);
+        var transacoes = carteiraService.consultarTransacoes(alunoId, tipo);
         return ResponseEntity.ok(transacoes);
     }
 }

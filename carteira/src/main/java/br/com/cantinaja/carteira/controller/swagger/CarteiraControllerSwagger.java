@@ -47,6 +47,7 @@ public interface CarteiraControllerSwagger {
             @ApiResponse(responseCode = "400", description = "Tipo de transação inválido", content = @Content(mediaType = "application/json", examples = @ExampleObject(name = "TipoInvalido", value = "{\"erro\": \"TIPO_TRANSACAO_INVALIDO\", \"mensagem\": \"O tipo de transação informado é inválido\"}")))
     })
     ResponseEntity<List<TransacaoResponseDTO>> consultarTransacoes(
+    ResponseEntity<List<?>> consultarTransacoes(
             @Parameter(description = "Identificador do aluno dono da carteira", example = "1") Long alunoId,
             @Parameter(description = "Tipo da transação para filtro (valores aceitos no enum TipoTransacao)", example = "PIX") TipoTransacao tipo
     );

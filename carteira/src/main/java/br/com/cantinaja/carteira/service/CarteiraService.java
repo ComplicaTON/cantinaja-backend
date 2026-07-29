@@ -58,6 +58,7 @@ public class CarteiraService {
 
     @Transactional(readOnly = true)
     public List<TransacaoResponseDTO> consultarTransacoes(Long alunoId, TipoTransacao tipo){
+    public List<?> consultarTransacoes(Long alunoId, TipoTransacao tipo){
         Carteira carteira = carteiraRepository.findByAlunoId(alunoId)
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "CARTEIRA_NAO_ENCONTRADA", "Carteira não encontrada"));
 
@@ -71,5 +72,6 @@ public class CarteiraService {
         return transacoes.stream()
                 .map(TransacaoResponseDTO::fromEntity)
                 .collect(Collectors.toList());
+        return transacoes;
     }
 }
