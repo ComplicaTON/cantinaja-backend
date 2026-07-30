@@ -1,0 +1,36 @@
+services:
+  cardapio:
+    build:
+      context: .
+      dockerfile: cardapio/Dockerfile
+    container_name: cantinaja-cardapio
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+
+  carteira:
+    build:
+      context: .
+      dockerfile: carteira/Dockerfile
+    container_name: cantinaja-carteira
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+
+  pedidos:
+    build:
+      context: .
+      dockerfile: pedidos/Dockerfile
+    container_name: cantinaja-pedidos
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+
+  alunos:
+    build:
+      context: .
+      dockerfile: alunos/Dockerfile
+    container_name: cantinaja-alunos
+    ports:
+      - "8084:8084"
+    restart: unless-stopped

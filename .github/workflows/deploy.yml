@@ -1,0 +1,22 @@
+name: Build & Deploy backend cantinaja (DEV)
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cantinaja-dev
+  cancel-in-progress: false
+
+jobs:
+  call-build:
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+
+  call-deploy-dev:
+    needs: call-build
+    uses: ./.github/workflows/deploy-dev.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write

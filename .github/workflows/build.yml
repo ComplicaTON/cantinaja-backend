@@ -1,25 +1,25 @@
-name: Build backend cantinaja
+name: Build (compila e roda os testes)
 
 on:
   pull_request:
     branches:
       - main
       - develop
+  workflow_call:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Subindo java 25
+      - name: Configurar Java 25
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '25'
           cache: maven
 
-      - name: Build do maven
+      - name: "Build + testes (reactor inteiro: common + os 4 módulos)"
         run: mvn -B clean verify

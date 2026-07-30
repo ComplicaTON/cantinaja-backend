@@ -1,0 +1,28 @@
+services:
+  cardapio:
+    image: ghcr.io/${GHCR_OWNER}/cantinaja-cardapio:${IMAGE_TAG:-latest}
+    container_name: cantinaja-cardapio
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+
+  carteira:
+    image: ghcr.io/${GHCR_OWNER}/cantinaja-carteira:${IMAGE_TAG:-latest}
+    container_name: cantinaja-carteira
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+
+  pedidos:
+    image: ghcr.io/${GHCR_OWNER}/cantinaja-pedidos:${IMAGE_TAG:-latest}
+    container_name: cantinaja-pedidos
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+
+  alunos:
+    image: ghcr.io/${GHCR_OWNER}/cantinaja-alunos:${IMAGE_TAG:-latest}
+    container_name: cantinaja-alunos
+    ports:
+      - "8084:8084"
+    restart: unless-stopped

@@ -1,0 +1,83 @@
+name: Deploy (ambiente DEV)
+
+on:
+  workflow_call:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        modulo: [cardapio, carteira, pedidos, alunos]
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Deixar o nome do dono do repo em minúsculo (exigência do GHCR)
+        run: echo "OWNER_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build e push da imagem do módulo ${{ matrix.modulo }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.modulo }}/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ env.OWNER_LC }}/cantinaja-${{ matrix.modulo }}:latest
+            ghcr.io/${{ env.OWNER_LC }}/cantinaja-${{ matrix.modulo }}:${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.modulo }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.modulo }}
+
+  deploy-cloud-run:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        include:
+          - modulo: cardapio
+            porta: 8081
+          - modulo: carteira
+            porta: 8082
+          - modulo: pedidos
+            porta: 8083
+          - modulo: alunos
+            porta: 8084
+    steps:
+      - name: Deixar o nome do dono do repo em minúsculo (exigência do GHCR)
+        run: echo "OWNER_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
+      - name: Autenticar no Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: "Deploy no Cloud Run: ${{ matrix.modulo }}"
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service: cantinaja-${{ matrix.modulo }}
+          region: southamerica-east1
+          image: ghcr.io/${{ env.OWNER_LC }}/cantinaja-${{ matrix.modulo }}:${{ github.sha }}
+          flags: >-
+            --port=${{ matrix.porta }}
+            --allow-unauthenticated
+            --min-instances=0
+            --max-instances=2
+            --memory=512Mi
+            --cpu=1

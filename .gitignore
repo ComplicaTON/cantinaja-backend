@@ -38,3 +38,8 @@ build/
 ### CUSTOM (BRUNO)
 .junie/
 SPRINT_01_Backend_A.md
+
+### Deploy (Docker / Oracle Cloud)
+.env
+*.pem
+*.key

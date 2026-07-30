@@ -1,0 +1,9 @@
+# Evita mandar lixo pro contexto de build do Docker (mais rápido e evita jar velho)
+**/target/
+.git/
+.github/
+.idea/
+*.iml
+.mvn/wrapper/maven-wrapper.jar
+README.md
+**/HELP.md
