@@ -24,29 +24,25 @@ public class TransacaoCarteira {
     @Column(name = "tipo", nullable = false)
     private String tipo;
 
-    @Column(name = "descricao", nullable = false)
-    private String descricao;
-
     @Column(name = "valor", nullable = false, precision = 10, scale = 2)
     private BigDecimal valor;
 
     @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
-    // Construtor Vazio (Obrigatório para o JPA/Banco de Dados!)
+    // 1. Construtor Vazio REAL (Sem nenhum parâmetro entre os parênteses)
     public TransacaoCarteira() {
     }
 
+    // 2. Construtor com os parâmetros exatos que você usa no Service
     public TransacaoCarteira(
             Long carteiraId,
             String tipo,
-            String descricao,
             BigDecimal valor,
             LocalDateTime dataHora
     ) {
         this.carteiraId = carteiraId;
         this.tipo = tipo;
-        this.descricao = descricao;
         this.valor = valor;
         this.dataHora = dataHora;
     }
@@ -63,10 +59,6 @@ public class TransacaoCarteira {
         return tipo;
     }
 
-    public String getDescricao() {
-        return descricao;
-    }
-
     public BigDecimal getValor() {
         return valor;
     }
@@ -77,10 +69,6 @@ public class TransacaoCarteira {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
     }
 
     public void setValor(BigDecimal valor) {

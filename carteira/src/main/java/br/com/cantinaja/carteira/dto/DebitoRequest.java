@@ -2,25 +2,13 @@ package br.com.cantinaja.carteira.dto;
 
 import java.math.BigDecimal;
 
-public class DebitoRequest {
+import jakarta.validation.constraints.NotNull;
 
-    private BigDecimal valor;
+import jakarta.validation.constraints.Positive;
 
-    // Construtor vazio
-    public DebitoRequest() {
-    }
+public record DebitoRequest(
 
-    // Construtor com campo
-    public DebitoRequest(BigDecimal valor) {
-        this.valor = valor;
-    }
-
-    // Getter e Setter
-    public BigDecimal getValor() {
-        return valor;
-    }
-
-    public void setValor(BigDecimal valor) {
-        this.valor = valor;
-    }
-}
+        @NotNull(message = "O valor do débito é obrigatório")
+        @Positive(message = "O valor do débito deve ser maior que zero")
+        BigDecimal valor
+) {}

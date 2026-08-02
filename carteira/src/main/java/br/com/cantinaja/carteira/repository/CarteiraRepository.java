@@ -1,6 +1,8 @@
 package br.com.cantinaja.carteira.repository;
 
 import java.util.Optional;
+
+import br.com.cantinaja.carteira.service.CarteiraService;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import br.com.cantinaja.carteira.model.Carteira;

@@ -43,7 +43,6 @@ public class CarteiraService {
         TransacaoCarteira transacao = new TransacaoCarteira(
                 carteira.getId(),
                 "DEBITO",
-                "Débito de compra na cantina",
                 valor,
                 LocalDateTime.now()
         );

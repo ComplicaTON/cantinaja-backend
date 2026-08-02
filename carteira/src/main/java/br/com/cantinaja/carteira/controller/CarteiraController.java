@@ -2,6 +2,7 @@
 package br.com.cantinaja.carteira.controller;
 
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +21,11 @@ public class CarteiraController {
     }
 
     @PostMapping("/{alunoId}/debitos")
-    public ResponseEntity<Void> debitar(@PathVariable Long alunoId, @RequestBody DebitoRequest request) {
-        carteiraService.debitar(alunoId, request.getValor());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<DebitoRequest> debitar(
+            @PathVariable Long alunoId,
+            @Valid @RequestBody DebitoRequest request) {
+        carteiraService.debitar(alunoId, request.valor());
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
 
