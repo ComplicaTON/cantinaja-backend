@@ -1,5 +1,11 @@
 package br.com.cantinaja.carteira.service;
 
+import java.math.BigDecimal;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import br.com.cantinaja.carteira.dto.CarteiraResponseDTO;
 import br.com.cantinaja.carteira.dto.RecargaRequestDTO;
 import br.com.cantinaja.carteira.dto.TransacaoResponseDTO;
@@ -22,6 +28,7 @@ public class CarteiraService {
 
     private static final BigDecimal RECARGA_MIN = new BigDecimal("5.00");
     private static final BigDecimal RECARGA_MAX = new BigDecimal("500.00");
+    private static final BigDecimal SALDO_BAIXO_LIMITE = new BigDecimal("10.00");
 
     private final CarteiraRepository carteiraRepository;
     private final TransacaoRepository transacaoRepository;
@@ -49,6 +56,15 @@ public class CarteiraService {
         transacaoRepository.save(new TransacaoCarteira(carteira, TipoTransacao.RECARGA, valor));
 
         return montarResponse(carteira);
+    }
+
+    public CarteiraResponseDTO consultar(Long alunoId) {
+        BigDecimal saldo = carteiraRepository.findByAlunoId(alunoId)
+                .map(Carteira::getSaldo)
+                .orElse(BigDecimal.ZERO);
+
+        boolean saldoBaixo = saldo.compareTo(SALDO_BAIXO_LIMITE) < 0;
+        return new CarteiraResponseDTO(alunoId, saldo, saldoBaixo);
     }
 
     private CarteiraResponseDTO montarResponse(Carteira carteira) {
