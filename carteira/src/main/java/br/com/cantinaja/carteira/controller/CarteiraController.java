@@ -46,7 +46,7 @@ public class CarteiraController implements CarteiraControllerSwagger {
         return ResponseEntity.ok(transacoes);
     }
 
-    @Override
+    //@Override
     @GetMapping(value = "/{alunoId}")
     public ResponseEntity<CarteiraResponseDTO> consultar(@PathVariable Long alunoId) {
         CarteiraResponseDTO response = carteiraService.consultar(alunoId);
