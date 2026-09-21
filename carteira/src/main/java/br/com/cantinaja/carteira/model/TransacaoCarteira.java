@@ -48,32 +48,39 @@ public class TransacaoCarteira {
 
     public Carteira getCarteira() {
         return carteira;
+    }
+
+    public void setCarteira(Carteira carteira) {
+        this.carteira = carteira;
+    }
+
     public Long getCarteiraId() {
-        return carteiraId;
+        return carteira != null ? carteira.getId() : null;
     }
 
     public TipoTransacao getTipo() {
-    public String getTipo() {
+        return tipo;
+    }
 
+    public void setTipo(TipoTransacao tipo) {
+        this.tipo = tipo;
     }
 
     public BigDecimal getValor() {
         return valor;
     }
 
-    public LocalDateTime getDataHora() {
-        return dataHora;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
     public void setValor(BigDecimal valor) {
         this.valor = valor;
+    }
+
+    public LocalDateTime getDataHora() {
+        return dataHora;
     }
 
     public void setDataHora(LocalDateTime dataHora) {
         this.dataHora = dataHora;
     }
 }
+
+

@@ -40,9 +40,28 @@ public class CarteiraService {
     }
 
     @Transactional
-    public void debitar(Long alunoId, BigDecimal valor) {
+    public CarteiraResponseDTO debitar(Long alunoId, BigDecimal valor) {
         if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("DADO_INVALIDO");
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "DADO_INVALIDO", "Valor do débito inválido");
+        }
+
+        Carteira carteira = carteiraRepository.findByAlunoId(alunoId)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "CARTEIRA_NAO_ENCONTRADA", "Carteira não encontrada"));
+
+        if (carteira.getSaldo().compareTo(valor) < 0) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "SALDO_INSUFICIENTE", "Saldo insuficiente para este débito");
+        }
+
+        carteira.setSaldo(carteira.getSaldo().subtract(valor));
+        carteira = carteiraRepository.save(carteira);
+
+        TransacaoCarteira transacao = new TransacaoCarteira(
+                carteira, TipoTransacao.DEBITO, valor
+        );
+        transacaoRepository.save(transacao);
+        return  montarResponse(carteira);
+    }
+
     public CarteiraResponseDTO recarregar(Long alunoId, RecargaRequestDTO request) {
         BigDecimal valor = request.valor();
 
@@ -53,41 +72,28 @@ public class CarteiraService {
 
         Carteira carteira = carteiraRepository.findByAlunoId(alunoId)
                 .orElseThrow(() -> new RuntimeException("CARTEIRA_NAO_ENCONTRADA"));
-                .orElseGet(() -> new Carteira(alunoId, BigDecimal.ZERO));
 
         carteira.setSaldo(carteira.getSaldo().add(valor));
         carteira = carteiraRepository.save(carteira);
 
         transacaoRepository.save(new TransacaoCarteira(carteira, TipoTransacao.RECARGA, valor));
 
-        if (carteira.getSaldo().compareTo(valor) < 0) {
-            throw new IllegalArgumentException("SALDO_INSUFICIENTE");
-        }
         return montarResponse(carteira);
     }
 
-        carteira.setSaldo(carteira.getSaldo().subtract(valor));
-        carteiraRepository.save(carteira);
     public CarteiraResponseDTO consultar(Long alunoId) {
         BigDecimal saldo = carteiraRepository.findByAlunoId(alunoId)
                 .map(Carteira::getSaldo)
                 .orElse(BigDecimal.ZERO);
 
-
-        TransacaoCarteira transacao = new TransacaoCarteira(
-                carteira.getId(),
-                "DEBITO",
-                valor,
-                LocalDateTime.now()
-        );
         boolean saldoBaixo = saldo.compareTo(SALDO_BAIXO_LIMITE) < 0;
         return new CarteiraResponseDTO(alunoId, saldo, saldoBaixo);
     }
 
     private CarteiraResponseDTO montarResponse(Carteira carteira) {
-        return new CarteiraResponseDTO(carteira.getAlunoId(), carteira.getSaldo(), false);
+        boolean saldoBaixo = carteira.getSaldo().compareTo(SALDO_BAIXO_LIMITE) < 0;
+        return new CarteiraResponseDTO(carteira.getAlunoId(), carteira.getSaldo(), saldoBaixo);
     }
-}
 
 
     @Transactional(readOnly = true)
@@ -97,13 +103,13 @@ public class CarteiraService {
 
         List<TransacaoCarteira> transacoes;
         if (tipo != null) {
-            transacoes = transacaoRepository.findByCarteiraIdAndTipoOrderByDataHoraDesc(carteira.getId(), tipo);
+            transacoes = transacaoRepository.findByCarteira_IdAndTipoOrderByDataHoraDesc(carteira.getId(), tipo);
         } else {
-            transacoes = transacaoRepository.findByCarteiraIdOrderByDataHoraDesc(carteira.getId());
+            transacoes = transacaoRepository.findByCarteira_IdOrderByDataHoraDesc(carteira.getId());
         }
 
         return transacoes.stream()
                 .map(TransacaoResponseDTO::fromEntity)
                 .collect(Collectors.toList());
     }
-};
+}

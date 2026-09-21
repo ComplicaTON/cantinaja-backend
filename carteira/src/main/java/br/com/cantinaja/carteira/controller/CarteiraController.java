@@ -26,7 +26,7 @@ public class CarteiraController implements CarteiraControllerSwagger {
     }
 
     @Override
-    @PostMapping(value="/{alunoId}/recargas")
+    @PostMapping(value = "/{alunoId}/recargas")
     public ResponseEntity<CarteiraResponseDTO> recarregar(
             @PathVariable Long alunoId,
             @Valid @RequestBody RecargaRequestDTO request
@@ -36,23 +36,28 @@ public class CarteiraController implements CarteiraControllerSwagger {
     }
 
     @PostMapping("/{alunoId}/debitos")
-    public ResponseEntity<DebitoRequest> debitar(
+    public ResponseEntity<CarteiraResponseDTO> debitar(
             @PathVariable Long alunoId,
             @Valid @RequestBody DebitoRequest request
     ) {
-        carteiraService.debitar(alunoId, request.valor());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        CarteiraResponseDTO response = carteiraService.debitar(alunoId, request.valor());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-        List <TransacaoResponseDTO> transacoes = carteiraService.consultarTransacoes(alunoId, tipo);
+    @GetMapping(value = "/{alunoId}")
+    public ResponseEntity<CarteiraResponseDTO> consultar(@PathVariable Long alunoId) {
+        CarteiraResponseDTO response = carteiraService.consultar(alunoId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{alunoId}/transacoes")
+    public ResponseEntity<List<TransacaoResponseDTO>> consultarTransacoes(
+            @PathVariable Long alunoId,
+            @RequestParam(required = false) TipoTransacao tipo
+    ) {
+        List<TransacaoResponseDTO> transacoes = carteiraService.consultarTransacoes(alunoId, tipo);
         return ResponseEntity.ok(transacoes);
     }
 }
 
-    //@Override
-    @GetMapping(value = "/{alunoId}")
-    public ResponseEntity<CarteiraResponseDTO> consultar(@PathVariable Long alunoId) {
-        CarteiraResponseDTO response = carteiraService.consultar(alunoId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-}
+
