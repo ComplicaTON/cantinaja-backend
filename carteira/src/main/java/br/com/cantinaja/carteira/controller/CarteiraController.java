@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import br.com.cantinaja.carteira.dto.DebitoRequest;
+import br.com.cantinaja.carteira.service.CarteiraService;
 import java.util.List;
 
 @RestController
@@ -33,18 +35,19 @@ public class CarteiraController implements CarteiraControllerSwagger {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
-
-    @GetMapping(value = "/{alunoId}/transacoes")
-    public ResponseEntity<List<TransacaoResponseDTO>> consultarTransacoes(
+    @PostMapping("/{alunoId}/debitos")
+    public ResponseEntity<DebitoRequest> debitar(
             @PathVariable Long alunoId,
-            @RequestParam(required = false) TipoTransacao tipo
-
-            ){
+            @Valid @RequestBody DebitoRequest request
+    ) {
+        carteiraService.debitar(alunoId, request.valor());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
         List <TransacaoResponseDTO> transacoes = carteiraService.consultarTransacoes(alunoId, tipo);
         return ResponseEntity.ok(transacoes);
     }
+}
 
     //@Override
     @GetMapping(value = "/{alunoId}")
