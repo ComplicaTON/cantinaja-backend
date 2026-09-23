@@ -17,6 +17,7 @@ public class TransacaoCarteira {
     @JoinColumn(name = "carteira_id", nullable = false)
     private Carteira carteira;
 
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
     private TipoTransacao tipo;
@@ -28,12 +29,11 @@ public class TransacaoCarteira {
     private LocalDateTime dataHora;
 
     protected TransacaoCarteira() {
-        // Construtor protegido para uso do JPA
-    }
 
+    }
     public TransacaoCarteira(
-        Carteira carteira, 
-        TipoTransacao tipo, 
+        Carteira carteira,
+        TipoTransacao tipo,
         BigDecimal valor
     ) {
         this.carteira = carteira;
@@ -50,15 +50,37 @@ public class TransacaoCarteira {
         return carteira;
     }
 
+    public void setCarteira(Carteira carteira) {
+        this.carteira = carteira;
+    }
+
+    public Long getCarteiraId() {
+        return carteira != null ? carteira.getId() : null;
+    }
+
     public TipoTransacao getTipo() {
         return tipo;
+    }
+
+    public void setTipo(TipoTransacao tipo) {
+        this.tipo = tipo;
     }
 
     public BigDecimal getValor() {
         return valor;
     }
 
+    public void setValor(BigDecimal valor) {
+        this.valor = valor;
+    }
+
     public LocalDateTime getDataHora() {
         return dataHora;
     }
+
+    public void setDataHora(LocalDateTime dataHora) {
+        this.dataHora = dataHora;
+    }
 }
+
+

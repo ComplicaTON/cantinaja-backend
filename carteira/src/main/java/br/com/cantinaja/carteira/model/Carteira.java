@@ -38,6 +38,10 @@ public class Carteira {
     public Long getAlunoId() {
         return alunoId;
     }
+    //Set pode remover
+    public void setAlunoId(Long alunoId) {
+        this.alunoId = alunoId;
+    }
 
     public BigDecimal getSaldo() {
         return saldo;

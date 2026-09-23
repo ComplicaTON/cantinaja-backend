@@ -2,6 +2,7 @@ package br.com.cantinaja.carteira.controller;
 
 import br.com.cantinaja.carteira.dto.CarteiraResponseDTO;
 import br.com.cantinaja.carteira.dto.RecargaRequestDTO;
+import br.com.cantinaja.carteira.repository.CarteiraRepository;
 import br.com.cantinaja.carteira.service.CarteiraService;
 import br.com.cantinaja.common.exception.BusinessException;
 import br.com.cantinaja.common.exception.GlobalExceptionHandler;
@@ -33,6 +34,9 @@ public class CarteiraControllerTests {
 
     @MockitoBean
     private CarteiraService service;
+
+    @MockitoBean
+    private CarteiraRepository carteiraRepository;
 
     @Test
     void deveRetornar201ERecarregarComSucesso() throws Exception {
