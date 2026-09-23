@@ -61,8 +61,15 @@ public class CarteiraService {
         transacaoRepository.save(transacao);
         return  montarResponse(carteira);
     }
-
+    @Transactional
     public CarteiraResponseDTO recarregar(Long alunoId, RecargaRequestDTO request) {
+        if (request == null || request.valor() == null) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "DADO_INVALIDO",
+                    "Valor da recarga inválido"
+            );
+        }
         BigDecimal valor = request.valor();
 
         if (valor.compareTo(RECARGA_MIN) < 0 || valor.compareTo(RECARGA_MAX) > 0) {
@@ -71,7 +78,7 @@ public class CarteiraService {
         }
 
         Carteira carteira = carteiraRepository.findByAlunoId(alunoId)
-                .orElseThrow(() -> new RuntimeException("CARTEIRA_NAO_ENCONTRADA"));
+                .orElseGet(() -> new Carteira(alunoId, BigDecimal.ZERO));
 
         carteira.setSaldo(carteira.getSaldo().add(valor));
         carteira = carteiraRepository.save(carteira);
