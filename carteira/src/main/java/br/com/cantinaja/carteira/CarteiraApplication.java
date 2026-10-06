@@ -17,7 +17,8 @@ public class CarteiraApplication {
 	}
 
 @Bean
-	@org.springframework.context.annotation.Profile("dev")
+	@org.springframework.context.annotation.Profile({"dev", "test"})
+	public CommandLineRunner carregarDadosIniciais(CarteiraRepository carteiraRepository) {
 		return args -> {
 			// Cria a carteira do aluno 1 com saldo de R$ 100,00 se ela ainda não existir
 			if (carteiraRepository.findByAlunoId(1L).isEmpty()) {
