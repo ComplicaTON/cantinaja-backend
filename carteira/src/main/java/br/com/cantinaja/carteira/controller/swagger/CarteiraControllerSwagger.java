@@ -1,6 +1,7 @@
 package br.com.cantinaja.carteira.controller.swagger;
 
 import br.com.cantinaja.carteira.dto.CarteiraResponseDTO;
+import br.com.cantinaja.carteira.dto.DebitoRequest;
 import br.com.cantinaja.carteira.dto.RecargaRequestDTO;
 import br.com.cantinaja.carteira.dto.TransacaoResponseDTO;
 import br.com.cantinaja.carteira.model.TipoTransacao;
@@ -44,11 +45,22 @@ public interface CarteiraControllerSwagger {
     @Operation(summary = "Consultar transações da carteira", description = "Retorna a lista de transações do aluno. Permite filtrar por tipo de transação.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Consulta realizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Tipo de transação inválido", content = @Content(mediaType = "application/json", examples = @ExampleObject(name = "TipoInvalido", value = "{\"erro\": \"TIPO_TRANSACAO_INVALIDO\", \"mensagem\": \"O tipo de transação informado é inválido\"}")))
+            @ApiResponse(responseCode = "400", description = "Tipo de transação inválido", content = @Content(mediaType = "application/json", examples =
+            @ExampleObject(name = "TipoInvalido", value = "{\"erro\": \"TIPO_TRANSACAO_INVALIDO\", \"mensagem\": \"O tipo de transação informado é inválido\"}")))
     })
     ResponseEntity<List<TransacaoResponseDTO>> consultarTransacoes(
             @Parameter(description = "Identificador do aluno dono da carteira", example = "1") Long alunoId,
             @Parameter(description = "Tipo da transação para filtro (valores aceitos no enum TipoTransacao)", example = "PIX") TipoTransacao tipo
     );
-}
 
+    @Operation(summary = "Debitar valor da carteira", description = "Realiza o débito de um determinado valor na carteira do aluno.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Débito realizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Saldo insuficiente ou dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Carteira não encontrada")
+    })
+    ResponseEntity<CarteiraResponseDTO> debitar(
+            @Parameter(description = "Identificador do aluno dono da carteira", example = "1") Long alunoId,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true) DebitoRequest request
+    );
+}

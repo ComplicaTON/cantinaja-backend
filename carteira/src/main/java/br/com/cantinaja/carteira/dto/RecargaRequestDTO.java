@@ -10,4 +10,6 @@ public record RecargaRequestDTO (
     @NotNull(message = "O valor da recarga é obrigatório")
     @Positive(message = "O valor da recarga não pode ser negativo")
     BigDecimal valor
-) {}
+) {
+
+}

@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import br.com.cantinaja.carteira.dto.DebitoRequest;
+import br.com.cantinaja.carteira.service.CarteiraService;
 import java.util.List;
 
 @RestController
@@ -24,7 +26,7 @@ public class CarteiraController implements CarteiraControllerSwagger {
     }
 
     @Override
-    @PostMapping(value="/{alunoId}/recargas")
+    @PostMapping(value = "/{alunoId}/recargas")
     public ResponseEntity<CarteiraResponseDTO> recarregar(
             @PathVariable Long alunoId,
             @Valid @RequestBody RecargaRequestDTO request
@@ -33,16 +35,29 @@ public class CarteiraController implements CarteiraControllerSwagger {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PostMapping("/{alunoId}/debitos")
+    public ResponseEntity<CarteiraResponseDTO> debitar(
+            @PathVariable Long alunoId,
+            @Valid @RequestBody DebitoRequest request
+    ) {
+        CarteiraResponseDTO response = carteiraService.debitar(alunoId, request.valor());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
+    @GetMapping(value = "/{alunoId}")
+    public ResponseEntity<CarteiraResponseDTO> consultar(@PathVariable Long alunoId) {
+        CarteiraResponseDTO response = carteiraService.consultar(alunoId);
+        return ResponseEntity.ok(response);
+    }
 
-    @GetMapping(value = "/{alunoId}/transacoes")
+    @GetMapping("/{alunoId}/transacoes")
     public ResponseEntity<List<TransacaoResponseDTO>> consultarTransacoes(
             @PathVariable Long alunoId,
             @RequestParam(required = false) TipoTransacao tipo
-
-            ){
-
-        List <TransacaoResponseDTO> transacoes = carteiraService.consultarTransacoes(alunoId, tipo);
+    ) {
+        List<TransacaoResponseDTO> transacoes = carteiraService.consultarTransacoes(alunoId, tipo);
         return ResponseEntity.ok(transacoes);
     }
 }
+
+
